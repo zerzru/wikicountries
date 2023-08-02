@@ -2,8 +2,9 @@
     session_start();
     require_once('engine.php');
 
-    if(isset($_POST['submit'])) {
-        global $usersTableName, $mainFileLink, $protocol;
+    if (isset($_POST['submit'])) {
+        global $usersTableName, $mainFileLink, $protocol, $link;
+
         $login = $_POST['login'];
         $password = $_POST['password'];
 
@@ -20,8 +21,8 @@
         $password = md5($password);
         $password = sha1($password);
         
-        $request = mysql_query("SELECT * FROM $usersTableName WHERE login='{$login}'");
-        $row = mysql_fetch_array($request);
+        $request = mysqli_query($link, "SELECT * FROM $usersTableName WHERE login='{$login}'");
+        $row = mysqli_fetch_array($request);
 
         if(empty($row['password'])) {
             exit("Пользователь с именем <strong>{$login}</strong> не существует");

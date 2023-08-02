@@ -1,13 +1,13 @@
 <?php
     session_start();
-    require_once('engine.php');
+    require_once('engine/engine.php');
 ?>
 <!DOCTYPE html>
 <html lang="ru">
     <head>
         <title>Wikicountries | Главная страница</title>
-        <link rel="stylesheet" type="text/css" href="https://wikicountries.000webhostapp.com/lib/scripts/style.css">
-        <link rel="icon" type="image/x-icon" href="https://wikicountries.000webhostapp.com/lib/lib/images/icon.jpg">
+        <link rel="stylesheet" type="text/css" href="/lib/scripts/style.css">
+        <link rel="icon" type="image/x-icon" href="/lib/lib/images/icon.jpg">
     </head>
     <body>
         <?php show_menu(); ?>
@@ -54,6 +54,7 @@
                 ?>
                 </ul>
             </div>
+            <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
             <footer>
                 <?php
                     global $notice;
@@ -62,5 +63,5 @@
             </footer>
         </div>
     </body>
-    <script src="http://localhost/wiki/lib/scripts/main.js"></script>
+    <script src="/lib/scripts/main.js"></script>
 </html>

@@ -1,6 +1,6 @@
 <?php
     session_start();
-    require_once('engine.php');
+    require_once('engine/engine.php');
 ?>
 
 <!DOCTYPE html>
@@ -22,7 +22,7 @@
         </header> <br>
         <div class="created_article">
             <h1>Восстановление пароля</h1> <hr>
-            <form action="engine.recovery.php" method="post">
+            <form action="engine/engine.recovery.php" method="post">
                 <h3>Почта</h3>
                 <input name="email" type="text" placeholder="Ваш E-mail">
                 <h3>Контрольный вопрос</h3>

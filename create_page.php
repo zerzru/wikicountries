@@ -1,12 +1,12 @@
 <?php
     session_start();
-    require_once 'engine.php';
+    require_once 'engine/engine.php';
     if (empty($_SESSION['login']) or empty($_SESSION['id'])) {
         header('Location: index.php');
     }
 
-    $request = mysql_query("SELECT * FROM users WHERE login='{$_SESSION['login']}'");
-    $row = mysql_fetch_array($request);
+    $request = mysqli_query($link, "SELECT * FROM users WHERE login='{$_SESSION['login']}'");
+    $row = mysqli_fetch_array($request);
 
     if($row['banned']=='yes') {
         header('Location: index.php');
@@ -45,7 +45,7 @@
             <button class="red_t">Красный текст</button>
             <button class="table_b">Таблица</button>
             <br> <br>
-            <form action="engine.article.php" method="post" class="new_article">
+            <form action="/engine/engine.article.php" method="post" class="new_article">
                 <input name="name" type="text" class="name" placeholder="Название статьи" required> <br> <br>
                 <textarea name="article" type="text" class="article_i" id="article">Текст статьи</textarea> <br>
                 <input name="comment" type="text" class="text" placeholder="Пояснение изменений">
@@ -53,6 +53,6 @@
                 <br><br><br>
             </form>
         </div>
-        <script src="https://wikicountries.000webhostapp.com/lib/scripts/main.js"></script>
+        <script src="/lib/scripts/main.js"></script>
     </body>
 </html>

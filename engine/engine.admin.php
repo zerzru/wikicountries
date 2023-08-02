@@ -13,21 +13,21 @@
     if(isset($_POST['a_ban'])) {
         global $usersTableName, $protocol, $articlesLink;
         $user_name = $_POST['a_name'];
-        $request = mysql_query("UPDATE `$usersTableName` SET `banned`='yes' WHERE login='{$user_name}'");
+        $request = mysqli_query($link, "UPDATE `$usersTableName` SET `banned`='yes' WHERE login='{$user_name}'");
         header("Location: {$protocol}{$articlesLink}user_{$user_name}.php");
     };
 
     if(isset($_POST['a_unban'])) {
         global $usersTableName, $protocol, $articlesLink;
         $user_name = $_POST['a_name'];
-        $request = mysql_query("UPDATE `$usersTableName` SET `banned`='' WHERE login='{$user_name}'");
+        $request = mysqli_query($link, "UPDATE `$usersTableName` SET `banned`='' WHERE login='{$user_name}'");
         header("Location: {$protocol}{$articlesLink}user_{$user_name}.php");
     };
 
     if(isset($_POST['still'])) {
         global $bannedTableName, $projectLink, $protocol;
         $issue_id_s = $_GET['still'];
-        $request = mysql_query("UPDATE {$bannedTableName} SET status='Решение: оставить заблокированным' WHERE id='$issue_id_s'");
+        $request = mysqli_query($link, "UPDATE {$bannedTableName} SET status='Решение: оставить заблокированным' WHERE id='$issue_id_s'");
         header("Location: {$protocol}{$projectLink}unban_panel.php");
     };
 
@@ -35,8 +35,8 @@
         global $bannedTableName, $usersTableName, $protocol, $projectLink;
         $issue_id_u = $_GET['unblock'];
         $user = $_GET['user'];
-        $request = mysql_query("UPDATE {$usersTableName} SET banned='' WHERE login='$user'");
-        $request = mysql_query("UPDATE {$bannedTableName} SET status='Решение: разблокировать' WHERE login='$user'");
+        $request = mysqli_query($link, "UPDATE {$usersTableName} SET banned='' WHERE login='$user'");
+        $request = mysqli_query($link, "UPDATE {$bannedTableName} SET status='Решение: разблокировать' WHERE login='$user'");
         header("Location: {$protocol}{$projectLink}unban_panel.php");
     };
 
@@ -44,21 +44,22 @@
         global $bannedUsersListTableName, $protocol, $projectLink;
         $user = $_POST['user'];
         $settings = parse_ini_file('config.ini');
-        $request = mysql_query("INSERT INTO {$bannedUsersListTableName}(login) VALUES($user)");
+        $request = mysqli_query($link, "INSERT INTO {$bannedUsersListTableName}(login) VALUES($user)");
         header("Location: {$protocol}{$projectLink}unban_panel.php");
     };
 
     if(isset($_POST['f_article'])) {
         global $articlesTableName;
         $name = $_POST['a_name'];
-        $request = mysql_query("UPDATE {$articlesTableName} SET type='favourite' WHERE name='$name'");
+        $request = mysqli_query($link, "UPDATE {$articlesTableName} SET type='favourite' WHERE name='$name'");
         header("Location: {$protocol}{$articlesLink}{$name}.php");
     }
 
     if(isset($_POST['g_article'])) {
         global $articlesTableName;
         $name = $_POST['a_name'];
-        $request = mysql_query("UPDATE {$articlesTableName} SET type='good' WHERE name='$name'");
+        $request = mysqli_query($link, "UPDATE {$articlesTableName} SET type='good' WHERE name='$name'");
+        #echo "{$protocol}{$articlesLink}{$name}.php";
         header("Location: {$protocol}{$articlesLink}{$name}.php");
     }
 ?>

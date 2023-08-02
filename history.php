@@ -8,8 +8,8 @@
 <html lang="ru">
     <head>
         <title>Wikicountries | История страницы «<?php echo $page_name; ?>»</title>
-        <link rel="stylesheet" type="text/css" href="http://localhost/wiki/lib/scripts/style.css">
-        <link rel="icon" type="image/x-icon" href="http://localhost/wiki/lib/images/icon.png">
+        <link rel="stylesheet" type="text/css" href="/lib/scripts/style.css">
+        <link rel="icon" type="image/x-icon" href="/lib/images/icon.png">
     </head>
     <body>
         <?php show_menu(); ?>
@@ -25,8 +25,8 @@
             <table class="table">
                 <tr><th>ID</th><th>Имя</th><th>Описание изменений</th><th>Дата</th><th>Код</th></tr>
                 <?php
-                    $request = mysql_query("SELECT * FROM {$page_name}");
-                    while($row = mysql_fetch_assoc($request)) {
+                    $request = mysqli_query($link, "SELECT * FROM {$page_name}");
+                    while($row = mysqli_fetch_assoc($request)) {
                         echo "<tr><td>{$row['id']}</td><td>{$row['name']}</td><td>{$row['comment']}</td><td>{$row['date']}</td><td><a href='view.php?page=$page_name&id={$row['id']}'>Посмотреть страницу</a></td></tr>";
                     }
                 ?>

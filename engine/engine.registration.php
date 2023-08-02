@@ -1,10 +1,10 @@
 <?php
     require_once('engine.php');
-    date_default_timezone_get('UTC+5');
+    date_default_timezone_set('UTC+5');
 
     function show_result() {
         if (isset($_POST['submit'])) {
-            global $usersTableName, $articlesFolder;
+            global $usersTableName, $articlesFolder, $link;
             $login = $_POST['login'];
             $password = $_POST['password'];
             $c_password = $_POST['c_password'];
@@ -30,21 +30,21 @@
                 $password = md5($password);
                 $password = sha1($password);
 
-                $request = mysql_query("SELECT `id` FROM `{$usersTableName}` WHERE login='$login'");
-                $answer = mysql_fetch_array($request);
+                $request = mysqli_query($link, "SELECT `id` FROM `{$usersTableName}` WHERE login='$login'");
+                $answer = mysqli_fetch_array($request);
                 if(!empty($answer['id'])) {
                     exit('Пользователь с таким именем уже существует');
                 }
 
-                $request2 = mysql_query("INSERT INTO {$usersTableName} (login, password, email, cquestion, date, ip) VALUES ('{$login}', '{$password}', '{$email}', '{$answer}', '{$regdate}', '{$user_ip}')");
+                $request2 = mysqli_query($link, "INSERT INTO {$usersTableName} (login, password, email, cquestion, date, ip, admin, banned) VALUES ('{$login}', '{$password}', '{$email}', '{$answer}', '{$regdate}', '{$user_ip}', 'no', 'no')");
 
                 if($request2 == 'TRUE') {
                     echo "Пользователь {$login} успешно зарегистрирован<br>";
-                    $fp = fopen("{$articlesFolder}user_{$login}.php", 'w');
+                    $fp = fopen("../{$articlesFolder}user_{$login}.php", 'w');
                     fwrite($fp,
     '<?php
         session_start();
-        require_once("engine/engine.php");
+        require_once("../engine/engine.php");
         $page_code = file_get_contents("user_'.$login.'.php.txt");
     ?>
     <!DOCTYPE html>
@@ -52,8 +52,8 @@
         <head>
             <meta charset="UTF-8">
             <title>Wikicountries | Участник: '.$login.'</title>
-            <link rel="stylesheet" type="text/css" href="https://wikicountries.000webhostapp.com/lib/scripts/style.css">
-            <link rel="icon" type="image/x-icon" href="https://wikicountries.000webhostapp.com/lib/images/icon.jpg">
+            <link rel="stylesheet" type="text/css" href="/lib/scripts/style.css">
+            <link rel="icon" type="image/x-icon" href="/lib/images/icon.jpg">
         </head>
         <body>
             <?php show_menu(); ?>
@@ -64,12 +64,12 @@
                 ?>
             </header> <br>
             <div class="created_article">
-                <form action="engine.admin.php" method="post">
+                <form action="/engine/engine.admin.php" method="post">
                     <?php
-                        show_admin_buttons_user();
+                        show_admin_buttons_user("'.$login.'");
                     ?>
                 </form>
-                <a href="edit.php?page=user_'.$login.'"><button>Редактировать</button></a>
+                <a href="/edit.php?page=user_'.$login.'"><button>Редактировать</button></a>
                 <?php echo $page_code; ?>
             </div>
         </body>
@@ -78,14 +78,25 @@
                     fclose($fp);
 
                     $post = "Это страница участника <strong>{$login}</strong>";
-                    $fp2 = fopen("{$articlesFolder}user_{$login}.php.txt", 'w');
+                    $fp2 = fopen("../{$articlesFolder}user_{$login}.php.txt", 'w');
                     fwrite($fp2, $post);
                     fclose($fp2);
 
                     $post = "Это страница участника [b]{$login}[/b]";
-                    $fp3 = fopen("{$articlesFolder}user_{$login}_editing.php.txt", 'w');
+                    $fp3 = fopen("../{$articlesFolder}user_{$login}_editing.php.txt", 'w');
                     fwrite($fp3, $post);
                     fclose($fp3);
+
+                    $request = mysqli_query($link,
+                    "CREATE TABLE {$login}(
+                    `id` INT(255) NOT NULL UNIQUE AUTO_INCREMENT,
+                    `name` VARCHAR(255) NOT NULL,
+                    `code` VARCHAR(255),
+                    `comment` VARCHAR(255),
+                    `date` VARCHAR(255),
+                    `ip` VARCHAR(255),
+                    PRIMARY KEY(id))");
+
                 } else {
                     echo 'Произошла неизвестная ошибка. Пожалуйста, перезагрузите страницу или попробуйте позже';
                 }
@@ -99,8 +110,8 @@
     <head>
         <meta charset="UTF-8">
         <title>Wikicountries | Регистрация</title>
-        <link rel="stylesheet" type="text/css" href="https://wikicountries.000webhostapp.com/lib/scripts/style.css">
-        <link rel="icon" type="image/x-icon" href="https://wikicountries.000webhostapp.com/lib/images/icon.jpg">
+        <link rel="stylesheet" type="text/css" href="/lib/scripts/style.css">
+        <link rel="icon" type="image/x-icon" href="/lib/images/icon.jpg">
     </head>
     <body>
         <?php show_menu(); ?>

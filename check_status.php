@@ -1,13 +1,13 @@
 <?php
     session_start();
-    require_once('engine.php');
+    require_once('engine/engine.php');
 
     if(isset($_POST['submit'])) {
-        $settings = parse_ini_file('config.ini');
+        $settings = parse_ini_file('engine/config.ini');
         $bannedTableName = $settings['bannedTableName'];
         $issue_id = $_POST['check_id'];
-        $request = mysql_query("SELECT * FROM $bannedTableName WHERE id='{$issue_id}'");
-        $row = mysql_fetch_assoc($request);
+        $request = mysqli_query($link, "SELECT * FROM $bannedTableName WHERE id='{$issue_id}'");
+        $row = mysqli_fetch_assoc($request);
     }
 ?>
 

@@ -5,7 +5,7 @@
 
     function show_result() {
         if (isset($_POST['submit'])) {
-            global $articlesFolder, $articlesLink, $articlesTableName, $protocol;
+            global $articlesFolder, $articlesLink, $articlesTableName, $protocol, $link;
             $name = $_POST['name'];
             $post = $_POST['article'];
             $comment = $_POST['comment'];
@@ -84,12 +84,12 @@
             $ename = str_replace('я', 'ya', $ename);
             $ename = str_replace(' ', '_', $ename);
 
-            $prerequest = mysql_query("SELECT * FROM $ename");
-            if(!empty($prerequest)) {
-                echo "Страница <a href='{$protocol}{$articlesLink}$ename.php'>$name</a> уже существует <br> <br>
-                <iframe src='{$protocol}{$articlesLink}$ename.php' width='1000px' height='300px'></iframe>";
-            } else {
-                $fp2 = fopen("{$articlesFolder}{$ename}_editing.php.txt", 'w');
+            #$prerequest = mysqli_query($link, "SELECT * FROM $ename");
+            #if(!empty($prerequest)) {
+            #    echo "Страница <a href='{$protocol}{$articlesLink}$ename.php'>$name</a> уже существует <br> <br>
+            #    <iframe src='{$protocol}{$articlesLink}$ename.php' width='1000px' height='300px'></iframe>";
+            #} else {
+                $fp2 = fopen("../{$articlesFolder}{$ename}_editing.php.txt", 'w');
                 fwrite($fp2, $post);
                 fclose($fp2);
 
@@ -183,19 +183,19 @@
                 $post = str_replace('|', '" class="link">', $post);
                 $post = str_replace(']', '</a>', $post);
 
-                $fp4 = fopen("{$articlesFolder}{$ename}_1.php.txt", 'w');
+                $fp4 = fopen("../{$articlesFolder}{$ename}_1.php.txt", 'w');
                 fwrite($fp4, $post);
                 fclose($fp4);
 
-                $fp2 = fopen("{$articlesFolder}{$ename}.php.txt", 'w');
+                $fp2 = fopen("../{$articlesFolder}{$ename}.php.txt", 'w');
                 fwrite($fp2, $post);
                 fclose($fp2);
 
-                $fp = fopen("{$articlesFolder}{$ename}.php", 'w');
+                $fp = fopen("../{$articlesFolder}{$ename}.php", 'w');
                 fwrite($fp,
 '<?php
     session_start();
-    require_once("engine.php");
+    require_once("../engine/engine.php");
     $page_code = file_get_contents("'.$ename.'.php.txt");
 ?>
 
@@ -204,8 +204,8 @@
     <head>
         <meta charset="UTF-8">
         <title>Wikicountries | '.$name.'</title>
-        <link rel="stylesheet" type="text/css" href="{$protocol}{$projectLink}lib/scripts/style.css">
-        <link rel="icon" type="image/x-icon" href="{$protocol}{$projectLink}lib/images/icon.jpg">
+        <link rel="stylesheet" type="text/css" href="/lib/scripts/style.css">
+        <link rel="icon" type="image/x-icon" href="/lib/images/icon.jpg">
     </head>
     <body>
         <?php show_menu(); ?>
@@ -217,8 +217,8 @@
         </header> <br>
         <div class="created_article">
             <span class="aname">'.$name.'</span> <br>
-            <div class="article_management"><?php check_article_status("'.$ename.'"); ?><li><a href="edit.php?page='.$ename.'">Изменить</a></li><li><a href="history.php?article='.$ename.'">История</a></li></div><br><br><hr style="margin-top:30px">
-                <?php show_admin_buttons_article(); ?>
+            <div class="article_management"><?php check_article_status("'.$ename.'"); ?><li><a href="/edit.php?page='.$ename.'">Изменить</a></li><li><a href="/history.php?article='.$ename.'">История</a></li></div><br><br><hr style="margin-top:30px">
+                <?php show_admin_buttons_article("'.$ename.'"); ?>
                 <?php echo $page_code; ?>
             </div>
             <div class="author">Первое изменение этой страницы было сделано пользователем '.$_SESSION['login'].' в '.$date.'</div>
@@ -227,7 +227,7 @@
 </html>');
                 fclose($fp);
 
-                $request = mysql_query(
+                $request = mysqli_query($link,
                     "CREATE TABLE {$ename}(
                     `id` INT(255) NOT NULL UNIQUE AUTO_INCREMENT,
                     `name` VARCHAR(255) NOT NULL,
@@ -239,13 +239,15 @@
 
                 global $protocol, $articlesLink;
 
-                $request = mysql_query("INSERT INTO {$ename}(name, comment, code, date, ip) VALUES('{$_SESSION['login']}', '$comment', '{$ename}_1.php.txt', '$date', '$ip')");
+                $request = mysqli_query($link, "INSERT INTO {$ename}(name, comment, code, date, ip) VALUES('{$_SESSION['login']}', '$comment', '{$ename}_1.php.txt', '$date', '$ip')");
 
-                $request = mysql_query("INSERT INTO {$articlesTableName}(name, type, description, date) VALUES('$ename', 'new', '{$protocol}{$articlesLink}{$ename}.php', '$date')");
-                header("{$articlesLink}{$ename}.php");
+                $request = mysqli_query($link, "INSERT INTO {$articlesTableName}(name, type, description, link, date) VALUES('$ename', 'new', '', '{$protocol}{$articlesLink}{$ename}.php', '$date')");
+
+#                echo "$protocol{$articlesLink}{$ename}.php";
+                header("Location: $protocol{$articlesLink}{$ename}.php");
             }
         }
-    }
+    #}
 ?>
 
 <!DOCTYPE html>
@@ -253,8 +255,8 @@
     <head>
         <meta charset="UTF-8">
         <title>Wikicountries | Создание страницы</title>
-        <link rel="stylesheet" type="text/css" href="https://wikicountries.000webhostapp.com/lib/scripts/style.css">
-        <link rel="icon" type="image/x-icon" href="https://wikicountries.000webhostapp.com/lib/images/icon.jpg">
+        <link rel="stylesheet" type="text/css" href="/lib/scripts/style.css">
+        <link rel="icon" type="image/x-icon" href="/lib/images/icon.jpg">
     </head>
     <body>
         <?php show_menu(); ?>

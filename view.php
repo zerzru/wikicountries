@@ -4,16 +4,16 @@
     $article = $_GET['page'];
     $version = $_GET['id'];
 
-    $request = mysql_query("SELECT * FROM $article WHERE id='$version'");
-    $row = mysql_fetch_assoc($request);
+    $request = mysqli_query($link, "SELECT * FROM $article WHERE id='$version'");
+    $row = mysqli_fetch_assoc($request);
 ?>
 
 <!DOCTYPE html>
 <html lang="ru">
     <head>
         <title>Wikicountries | Просмотр страницы <?php echo "«$article»"; ?></title>
-        <link rel="stylesheet" type="text/css" href="http://localhost/wiki/lib/scripts/style.css">
-        <link rel="icon" type="image/x-icon" href="http://localhost/wiki/lib/images/icon.png">
+        <link rel="stylesheet" type="text/css" href="/lib/scripts/style.css">
+        <link rel="icon" type="image/x-icon" href="/lib/images/icon.png">
     </head>
     <body>
         <?php show_menu(); ?>
@@ -31,7 +31,7 @@
                     <?php echo "Вы читаете версию страницы, созданную {$row['date']}. Эта версия может значительно отличаться от <a href='$article.php'>последней версии</a> страницы";?>
                 </div> <br>
                 <?php
-                    $code = file_get_contents($row['code']);
+                    $code = file_get_contents("$articlesFolder{$row['code']}");
                     echo $code;
                 ?>
             </center>

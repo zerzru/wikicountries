@@ -3,7 +3,8 @@
     require_once('engine.php');
 
     if(isset($_POST['submit'])) {
-        global $articlesFolder, $protocol, $articlesLink;
+        global $articlesFolder, $protocol, $articlesLink, $link;
+
         $name = $_POST['name'];
         $comment = $_POST['comment'];
         $post = $_POST['e_article'];
@@ -11,7 +12,7 @@
         $date = date('d.m.Y H:i:s');
         $ip = getUserIP();
 
-        $fp = fopen("{$articlesFolder}{$name}_editing.php.txt", 'w');
+        $fp = fopen("../{$articlesFolder}{$name}_editing.php.txt", 'w');
         fwrite($fp, $post);
         fclose($fp);
 
@@ -109,22 +110,22 @@
         $post = str_replace('|', '" class="link">', $post);
         $post = str_replace(']', '</a>', $post);
 
-        $q = mysql_query("SELECT * FROM `{$name}` ORDER BY id DESC LIMIT 1");
-        $qf = mysql_fetch_assoc($q);
+        $q = mysqli_query($link, "SELECT * FROM `{$name}` ORDER BY id DESC LIMIT 1");
+        $qf = mysqli_fetch_assoc($q);
         $idn = $qf['id'];
         $idn = $idn + 1;
 
-        $fp3 = fopen("{$articlesFolder}{$name}_$idn.php.txt", 'w');
+        $fp3 = fopen("../{$articlesFolder}{$name}_$idn.php.txt", 'w');
         fwrite($fp3, $post);
         fclose($fp3);
 
-        $fp2 = fopen("{$articlesFolder}{$name}.php.txt", 'w');
+        $fp2 = fopen("../{$articlesFolder}{$name}.php.txt", 'w');
         fwrite($fp2, $post);
         fclose($fp2);
 
         $code = $name.'_'.$idn.'.php.txt';
 
-        $request = mysql_query("INSERT INTO {$name}(name, comment, code, date, ip) VALUES('{$_SESSION['login']}', '$comment', '$code', '$date', '$ip')");
+        $request = mysqli_query($link, "INSERT INTO {$name}(name, comment, code, date, ip) VALUES('{$_SESSION['login']}', '$comment', '$code', '$date', '$ip')");
 
         header("Location: {$protocol}{$articlesLink}{$name}.php");
     }

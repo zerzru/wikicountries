@@ -23,10 +23,10 @@
     $protocol = $settings['protocol'];
     $bannedUsersListTableName = $settings['bannedUsersListTableName'];
 
-    $link = mysqli_connect($host, $user, $password, $database) or die("".mysqli_error($link));
+    $link = mysqli_connect($host, $user, $password, $database) or die("Can't connect to database".mysqli_error($link));
 
-    mysql_connect($host, $user, $password) or die('Ошибка подключения к базе данных');
-    mysql_select_db($database) or die('Ошибка подключения к базе данных');
+    #mysqli_connect($host, $user, $password) or die('Ошибка подключения к базе данных');
+    mysqli_select_db($link, $database) or die('Ошибка подключения к базе данных');
 
     function tech_works($mode, $type, $date, $time) {
         if($mode=='true') {
@@ -41,36 +41,35 @@
     }
 
     function show_articles($type) {
-        global $articlesTableName;
+        global $articlesTableName, $link;
 
-        $request = mysql_query("SELECT * FROM {$articlesTableName} WHERE type='$type'");
-        while($row = mysql_fetch_assoc($request)) {
+        $request = mysqli_query($link, "SELECT * FROM {$articlesTableName} WHERE type='$type'");
+        while ($row = mysqli_fetch_assoc($request)) {
             echo "<li><a href='{$row['link']}'>{$row['name']}</a></li>";
         }
     }
 
     function check_user_status() {
-        global $usersTableName, $protocol, $projectLink;
-        if(empty($_SESSION['login'])) {
+        global $usersTableName, $protocol, $projectLink, $link;
+
+        if (empty($_SESSION['login'])) {
             echo '';
         } else {
-            $request = mysql_query("SELECT * FROM {$usersTableName} WHERE login='{$_SESSION['login']}'");
-            $row = mysql_fetch_assoc($request);
+            $request = mysqli_query($link, "SELECT * FROM {$usersTableName} WHERE login='{$_SESSION['login']}'");
+            $row = mysqli_fetch_assoc($request);
 
-            if($row['banned']=='yes') {
-                header("{$protocol}{$projectLink}");   
-            }
-        
-            if($row['admin']=='yes') {
+            if ($row['banned']=='yes')
+                header("{$protocol}{$projectLink}");
+    
+            if ($row['admin']=='yes')
                 echo "<span class='favourite'>Администратор</span>";
-            }
         }
     }
 
     function check_article_status($name) {
-        global $articlesTableName;
-        $request = mysql_query("SELECT * FROM {$articlesTableName} WHERE name='$name'");
-        $row = mysql_fetch_assoc($request);
+        global $articlesTableName, $link;
+        $request = mysqli_query($link, "SELECT * FROM {$articlesTableName} WHERE name='$name'");
+        $row = mysqli_fetch_assoc($request);
 
         if($row['type']=='new') {
             echo "<span class='new'>Новая статья</span>";
@@ -90,16 +89,17 @@
     }
 
     function show_account_name() {
-        global $usersTableName, $bannedTableName, $protocol, $projectLink, $articlesLink;
+        global $usersTableName, $bannedTableName, $protocol, $projectLink, $articlesLink, $link;
+
         if (empty($_SESSION['login']) or empty($_SESSION['id'])) {
             echo "Гость ";
         } else {
             $request = "SELECT * FROM {$usersTableName} WHERE login = '{$_SESSION['login']}'";
-            $answers = mysql_query($request);
-            $row = mysql_fetch_assoc($answers);
+            $answers = mysqli_query($link, $request);
+            $row = mysqli_fetch_assoc($answers);
             $afterrequest = "SELECT * FROM {$bannedTableName} WHERE login = '{$_SESSION['login']}'";
-            $afteranswers = mysql_query($afterrequest);
-            $afterrow = mysql_fetch_assoc($afteranswers);
+            $afteranswers = mysqli_query($link, $afterrequest);
+            $afterrow = mysqli_fetch_assoc($afteranswers);
 
             if ($row['banned']=='yes') {
                 if(empty($afterrow['id'])) {
@@ -125,14 +125,14 @@
         };
     };
 
-    function show_admin_buttons_user() {
-        global $usersTableName;
-        $request = mysql_query("SELECT * FROM $usersTableName WHERE login='{$_SESSION['login']}'");
-        $row = mysql_fetch_array($request);
+    function show_admin_buttons_user($user) {
+        global $usersTableName, $link;
+        $request = mysqli_query($link, "SELECT * FROM $usersTableName WHERE login='{$_SESSION['login']}'");
+        $row = mysqli_fetch_array($request);
 
-        if($row["admin"]=="yes") {
+        if ($row["admin"]=="yes") {
             echo '<p>';
-            echo "<input name='a_name' class='submit' type='text' placeholder='Имя пользователя'>";
+            echo "<input name='a_name' class='submit' type='text' placeholder='Имя пользователя' value='$user'>";
             echo "<input name='a_ban' class='submit' type='submit' value='Заблокировать'>";
             echo "<input name='a_unban' class='submit' type='submit' value='Разблокировать'>";
             echo '</p>';
@@ -140,20 +140,21 @@
     };
 
     function show_head_html() {
-        global $protocol, $projectLink;
+        global $protocol, $projectLink, $link;
         echo
 '<meta charset="UTF-8">
 <link rel="stylesheet" type="text/css" href="'.$protocol.$projectLink.'lib/scripts/style.css">
 <link rel="icon" type="image/x-icon" href="'.$protocol.$projectLink.'lib/images/icon.jpg">';
     }
 
-    function show_admin_buttons_article() {
-        global $usersTableName;
-        $request = mysql_query("SELECT * FROM $usersTableName WHERE login='{$_SESSION['login']}'");
-        $row = mysql_fetch_array($request);
+    function show_admin_buttons_article($article_name) {
+        global $usersTableName, $link;
+
+        $request = mysqli_query($link, "SELECT * FROM $usersTableName WHERE login='{$_SESSION['login']}'");
+        $row = mysqli_fetch_array($request);
 
         if($row['admin']=='yes') {
-            echo "<p><form action='engine/engine.admin.php' method='post'><input name='a_name' class='submit' type='text'>";
+            echo "<p><form action='/engine/engine.admin.php' method='post'><input name='a_name' class='submit' type='text' value='$article_name'>";
             echo "<input name='f_article' class='submit' type='submit' value='Избранная статья'>";
             echo "<input name='g_article' class='submit' type='submit' value='Хорошая статья'>";
             echo "<input name='a_save' class='submit' type='submit' value='Сохранить статью'>";
@@ -162,38 +163,40 @@
     };
 
     function show_menu() {
-        global $usersTableName, $protocol, $projectLink;
-        if(empty($_SESSION['login'])) {
+        global $usersTableName, $protocol, $projectLink, $link;
+
+        if (empty($_SESSION['login'])) {
+            echo
+"<div class='menu'>
+    <a href='{$protocol}{$projectLink}'><img src='{$protocol}{$projectLink}/lib/images/icon.png' width='160px'></a>
+    <li><a href='{$protocol}{$projectLink}index'>Главная</a></li>
+    <li><a href='{$protocol}{$projectLink}authors'>Авторы</a></li>
+    <li><a href='{$protocol}{$projectLink}engine_page'>Движок</a></li>
+    <li><a href='{$protocol}{$projectLink}check_status'>Проверить дело</li>
+    <li><a href='{$protocol}{$projectLink}settings'>Настройки</a></li>
+    <!--<li><a href='{$protocol}{$projectLink}about'>О проекте</a></li>-->
+    <li><a href='{$protocol}{$projectLink}license'>Лицензия</a></li>
+</div>
+";
+        } else {
+            $request = mysqli_query($link, "SELECT * FROM {$usersTableName} WHERE login='{$_SESSION['login']}'");
+            $row = mysqli_fetch_assoc($request);
+
+            if($row['admin']=='yes')
+                $admin_link = "<li><a href='{$protocol}{$projectLink}unban_panel'>Панель</a></li>";
+            else
+                $admin_link = '';
+
             echo
 "<div class='menu'>
     <a href='{$protocol}{$projectLink}'><img src='{$protocol}{$projectLink}lib/images/icon.png' width='160px'></a>
     <li><a href='{$protocol}{$projectLink}index'>Главная</a></li>
     <li><a href='{$protocol}{$projectLink}authors'>Авторы</a></li>
-    <li><a href='{$protocol}{$projectLink}engine.php'>Движок</a></li>
-    <li><a href='{$protocol}{$projectLink}check_status'>Проверить дело</li>
-    <li><a href='{$protocol}{$projectLink}settings'>Настройки</a></li>
-    <li><a href='{$protocol}{$projectLink}about'>О проекте</a></li>
-    <li><a href='{$protocol}{$projectLink}license'>Лицензия</a></li>
-</div>
-";
-        } else {
-            $request = mysql_query("SELECT * FROM {$usersTableName} WHERE login='{$_SESSION['login']}'");
-            $row = mysql_fetch_assoc($request);
-            if($row['admin']=='yes') {
-                $admin_link = "<li><a href='{$protocol}{$projectLink}unban_panel'>Панель</a></li>";
-            } else {
-                $admin_link = '';
-            }
-            echo
-"<div class='menu'>
-    <a href='{$protocol}{$projectLink}'><img src='{$protocol}{$projectLink}lib/images/icon.png' width='160px'></a>
-    <li><a href='{$protocol}{$projectLink}index'>Главная</a></li>
-    <li><a href='{$protocol}{$projectLink}author'>Авторы</a></li>
-    <li><a href='{$protocol}{$projectLink}engine.php'>Движок</a></li>
+    <li><a href='{$protocol}{$projectLink}engine_page'>Движок</a></li>
     $admin_link
     <li><a href='{$protocol}{$projectLink}check_status'>Проверить дело</li>
     <li><a href='{$protocol}{$projectLink}settings'>Настройки</a></li>
-    <li><a href='{$protocol}{$projectLink}about'>О проекте</a></li>
+    <!--<li><a href='{$protocol}{$projectLink}about'>О проекте</a></li>-->
     <li><a href='{$protocol}{$projectLink}license'>Лицензия</a></li>
 </div>
 ";
@@ -201,9 +204,10 @@
     }
 
     function get_user_info() {
-        global $usersTableName;
-        $request = mysql_query("SELECT * FROM {$usersTableName} WHERE login='{$_SESSION['login']}'");
-        $row = mysql_fetch_assoc($request);
+        global $usersTableName, $link;
+
+        $request = mysqli_query($link, "SELECT * FROM {$usersTableName} WHERE login='{$_SESSION['login']}'");
+        $row = mysqli_fetch_assoc($request);
 
         if($row['banned']=='yes') {
             $banned = 'Да';
@@ -220,7 +224,7 @@
         echo
 "
 <div class='user_info'>
-    <form action='engine/engine.settings.php' method='post'>
+    <form action='/engine/engine.settings.php' method='post'>
         <h3>Информация</h3>
         <table class='table'>
             <tr><td>Имя пользователя</td><td>{$row['login']}</td></tr>

@@ -3,15 +3,15 @@
     require_once 'engine/engine.php';
     check_user_status();
     $page_name = $_GET['page'];
-    $page_code = file_get_contents("{$page_name}_editing.php.txt");
+    $page_code = file_get_contents("article/{$page_name}_editing.php.txt");
 ?>
 <!-- «» -->
 <!DOCTYPE html>
 <html lang="ru">
     <head>
         <title>Wikicountries | Редактировать статью «<?php echo $page_name; ?>»</title>
-        <link rel="stylesheet" type="text/css" href="http://localhost/wiki/lib/scripts/style.css">
-        <link rel="icon" type="image/x-icon" href="http://localhost/wiki/lib/images/icon.jpg">
+        <link rel="stylesheet" type="text/css" href="/lib/scripts/style.css">
+        <link rel="icon" type="image/x-icon" href="/lib/images/icon.jpg">
     </head>
     <body>
         <?php show_menu(); ?>
@@ -45,5 +45,5 @@
             </form>
         </div>
     </body>
-    <script src="http://localhost/wiki/lib/scripts/main.js"></script>
+    <script src="/lib/scripts/main.js"></script>
 </html>

@@ -1,6 +1,6 @@
 <?php
     session_start();
-    require_once('engine.php');
+    require_once('engine/engine.php');
 ?>
 
 <!DOCTYPE html>
@@ -15,7 +15,7 @@
         <?php show_menu(); ?>
         <div class="created_article">
             <div class="registration">
-                <form action="engine.registration.php" method="post">
+                <form action="engine/engine.registration.php" method="post">
                     <p>Ваше имя пользователя</p>
                     <input name="login" type="text" placeholder="Ваш логин" class="r_login" required>
                     <p>Почта</p>
@@ -30,7 +30,7 @@
                 </form>
             </div>
             <div class="authorization">
-                <form action="engine.authorization.php" method="post">
+                <form action="engine/engine.authorization.php" method="post">
                     <p>Имя пользователя</p>
                     <input name="login" type="text" placeholder="Ваш логин" class="r_login" required>
                     <p>Пароль</p>
